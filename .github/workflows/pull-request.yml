@@ -1,0 +1,39 @@
+name: Auto Create Pull Request on Update-CFN Branch Push
+
+on:
+  push:
+    branches:
+      - update-cfn
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup GitHub CLI with PAT
+        run: |
+          echo "${{ secrets.PAT_TOKEN }}" | gh auth login --with-token
+
+      - name: Create Pull Request
+        run: |
+          # Define the target and source branches
+          target_branch="main"
+          source_branch="update-cfn"
+          pr_title="Automated Pull Request: Update CloudFormation"
+          pr_body="This pull request merges changes from the \`update-cfn\` branch into \`main\`. Please review the updates."
+
+          # Check if a PR already exists for the branch
+          existing_pr=$(gh pr list --base $target_branch --head $source_branch --json id --jq '.[].id')
+          if [ -n "$existing_pr" ]; then
+            echo "A pull request already exists: $existing_pr"
+          else
+            # Create a new pull request
+            gh pr create --base $target_branch --head $source_branch --title "$pr_title" --body "$pr_body"
+            echo "Pull request created successfully."
+          fi
