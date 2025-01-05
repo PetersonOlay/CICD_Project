@@ -1,2 +1,2 @@
 # CICD Project
-Automate Lambda Function using GitHub Action
+Automate GitHub Action workflow
