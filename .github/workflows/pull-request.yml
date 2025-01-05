@@ -1,4 +1,4 @@
-name: Auto Create Pull Request
+name: Auto Create Pull Request on Update-CFN Branch Push
 
 on:
   push:
@@ -22,18 +22,18 @@ jobs:
 
       - name: Create Pull Request
         run: |
-          # Define the branch and PR title/description
+          # Define the target and source branches
           target_branch="main"
           source_branch="update-cfn"
-          pr_title="Automated Pull Request from $source_branch to $target_branch"
-          pr_body="This pull request is automatically created to merge changes from $source_branch into $target_branch."
+          pr_title="Automated Pull Request: Update CloudFormation"
+          pr_body="This pull request merges changes from the \`update-cfn\` branch into \`main\`. Please review the updates."
 
-          # Check if a PR already exists
+          # Check if a PR already exists for the branch
           existing_pr=$(gh pr list --base $target_branch --head $source_branch --json id --jq '.[].id')
           if [ -n "$existing_pr" ]; then
-            echo "Pull request already exists: $existing_pr"
+            echo "A pull request already exists: $existing_pr"
           else
-            # Create a new PR
+            # Create a new pull request
             gh pr create --base $target_branch --head $source_branch --title "$pr_title" --body "$pr_body"
             echo "Pull request created successfully."
           fi
