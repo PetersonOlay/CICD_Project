@@ -18,7 +18,7 @@ Resources:
       BucketName: !Sub '${AWS::StackName}-${Environment}-bucket'
       Tags:
         - Key: Environment
-          Value: !Ref Environment     
+          Value: staging     
 
 Outputs:
   BucketName: 
