@@ -1,0 +1,39 @@
+name: Auto Create Pull Request
+
+on:
+  push:
+    branches:
+      - update-cfn
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup GitHub CLI
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+      - name: Create Pull Request
+        run: |
+          # Define the branch and PR title/description
+          target_branch="main"
+          source_branch="update-cfn"
+          pr_title="Automated Pull Request from $source_branch to $target_branch"
+          pr_body="This pull request is automatically created to merge changes from $source_branch into $target_branch."
+
+          # Check if a PR already exists
+          existing_pr=$(gh pr list --base $target_branch --head $source_branch --json id --jq '.[].id')
+          if [ -n "$existing_pr" ]; then
+            echo "Pull request already exists: $existing_pr"
+          else
+            # Create a new PR
+            gh pr create --base $target_branch --head $source_branch --title "$pr_title" --body "$pr_body"
+            echo "Pull request created successfully."
+          fi
