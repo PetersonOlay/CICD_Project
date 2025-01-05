@@ -31,7 +31,8 @@ jobs:
             stack_name="pr-test-stack-${{github.event.pull_request.number}}"
             aws cloudformation create-stack --stack-name $stack_name \
                 --template-body file://cloudformation/s3-bucket.yml \
-                --parameters ParameterKey=Environment,ParameterValue=test 
+                --parameters ParameterKey=Environment,ParameterValue=test \
+                --parameters ParameterKey=Project,ParameterValue=GithubActionsTest 
 
             - name: Comment on the PR
             uses: actions/github-script@v6
